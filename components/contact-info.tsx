@@ -8,10 +8,10 @@ const contactMethods = [
   {
     icon: Phone,
     title: "Phone",
-    details: "+1 (555) 123-4567",
+    details: "+27 84 389-2067",
     description: "Call us during business hours",
     action: "Call Now",
-    href: "tel:+15551234567",
+    href: "tel:+27843892067",
   },
   {
     icon: Mail,
