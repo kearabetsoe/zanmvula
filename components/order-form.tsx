@@ -184,27 +184,29 @@ export function OrderForm() {
   return (
     <div className="space-y-6">
       {/* Progress Steps */}
-      <div className="flex items-center justify-center space-x-4 mb-8">
+      <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2 lg:space-x-4 mb-8 px-2">
         {steps.map((step, index) => (
-          <div key={step.number} className="flex items-center">
+          <div key={step.number} className="flex items-center w-full sm:w-auto">
             <div
-              className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+              className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 ${
                 currentStep >= step.number
                   ? "bg-primary border-primary text-primary-foreground"
                   : "border-muted-foreground text-muted-foreground"
               }`}
             >
-              <step.icon className="h-4 w-4" />
+              <step.icon className="h-3 w-3 sm:h-4 sm:w-4" />
             </div>
             <span
-              className={`ml-2 text-sm font-medium ${
+              className={`ml-2 text-xs sm:text-sm font-medium ${
                 currentStep >= step.number ? "text-primary" : "text-muted-foreground"
               }`}
             >
               {step.title}
             </span>
             {index < steps.length - 1 && (
-              <div className={`w-8 h-0.5 mx-4 ${currentStep > step.number ? "bg-primary" : "bg-muted"}`} />
+              <div
+                className={`hidden sm:block w-4 lg:w-8 h-0.5 mx-2 lg:mx-4 ${currentStep > step.number ? "bg-primary" : "bg-muted"}`}
+              />
             )}
           </div>
         ))}
@@ -212,33 +214,35 @@ export function OrderForm() {
 
       {/* Step 1: Product Details */}
       {currentStep === 1 && (
-        <Card>
+        <Card className="mx-2 sm:mx-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Package className="h-5 w-5" />
               Traditional Garment Details
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 p-4 sm:p-6">
             {selectedProduct && (
-              <div className="flex items-center space-x-4 p-4 bg-muted rounded-lg">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 bg-muted rounded-lg">
                 <img
                   src={selectedProduct.image || "/placeholder.svg"}
                   alt={selectedProduct.name}
-                  className="w-20 h-20 object-cover rounded"
+                  className="w-full sm:w-20 h-48 sm:h-20 object-cover rounded"
                 />
-                <div className="flex-1">
-                  <h3 className="font-semibold">{selectedProduct.name}</h3>
+                <div className="flex-1 w-full">
+                  <h3 className="font-semibold text-lg sm:text-base">{selectedProduct.name}</h3>
                   <p className="text-sm text-muted-foreground mb-2">{selectedProduct.description}</p>
-                  <p className="text-2xl font-bold text-primary">${selectedProduct.price}</p>
-                  <Badge variant="outline" className="capitalize">
-                    {selectedProduct.category}
-                  </Badge>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <p className="text-2xl font-bold text-primary">${selectedProduct.price}</p>
+                    <Badge variant="outline" className="capitalize w-fit">
+                      {selectedProduct.category}
+                    </Badge>
+                  </div>
                 </div>
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="size">Base Size (for reference)</Label>
                 <Select value={formData.size} onValueChange={(value) => updateFormData("size", value)}>
@@ -293,15 +297,15 @@ export function OrderForm() {
 
       {/* Step 2: Personal Information */}
       {currentStep === 2 && (
-        <Card>
+        <Card className="mx-2 sm:mx-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
               Personal Information
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <CardContent className="space-y-4 p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="firstName">First Name</Label>
                 <Input
@@ -349,14 +353,14 @@ export function OrderForm() {
 
       {/* Step 3: Address */}
       {currentStep === 3 && (
-        <Card>
+        <Card className="mx-2 sm:mx-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MapPin className="h-5 w-5" />
               Delivery Address
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 p-4 sm:p-6">
             <div>
               <Label htmlFor="street">Street Address</Label>
               <Input
@@ -367,7 +371,7 @@ export function OrderForm() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="city">City</Label>
                 <Input
@@ -388,7 +392,7 @@ export function OrderForm() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="zipCode">ZIP/Postal Code</Label>
                 <Input
@@ -421,7 +425,7 @@ export function OrderForm() {
 
       {/* Step 4: Measurements */}
       {currentStep === 4 && (
-        <Card>
+        <Card className="mx-2 sm:mx-0">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Ruler className="h-5 w-5" />
@@ -432,8 +436,8 @@ export function OrderForm() {
               these for your custom garment. Leave blank if unsure - we'll schedule a consultation.
             </p>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <CardContent className="space-y-4 p-4 sm:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="chest">Chest/Bust (inches)</Label>
                 <Input
@@ -506,13 +510,13 @@ export function OrderForm() {
             {selectedProduct && (
               <div className="bg-muted p-4 rounded-lg border-l-4 border-primary">
                 <h4 className="font-semibold mb-2">Order Summary</h4>
-                <div className="flex justify-between items-center">
-                  <span>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                  <span className="text-sm sm:text-base">
                     {selectedProduct.name} × {formData.quantity}
                   </span>
-                  <span className="font-bold">${(selectedProduct.price * formData.quantity).toFixed(2)}</span>
+                  <span className="font-bold text-lg">${(selectedProduct.price * formData.quantity).toFixed(2)}</span>
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">
+                <div className="text-sm text-muted-foreground mt-1 break-words">
                   Base Size: {formData.size || "Not selected"} | Color: {formData.color || "Not selected"}
                 </div>
                 <div className="text-xs text-muted-foreground mt-2 italic">
@@ -525,17 +529,22 @@ export function OrderForm() {
       )}
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={prevStep} disabled={currentStep === 1} className="bg-transparent">
+      <div className="flex justify-between px-2 sm:px-0 gap-4">
+        <Button
+          variant="outline"
+          onClick={prevStep}
+          disabled={currentStep === 1}
+          className="bg-transparent flex-1 sm:flex-none"
+        >
           Previous
         </Button>
 
         {currentStep < 4 ? (
-          <Button onClick={nextStep} className="bg-primary hover:bg-primary/90">
+          <Button onClick={nextStep} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none">
             Next Step
           </Button>
         ) : (
-          <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90">
+          <Button onClick={handleSubmit} className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none">
             Submit Order
           </Button>
         )}
