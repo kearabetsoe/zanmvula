@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   title: "Zanemvula - Traditional African Menswear",
   description: "Custom traditional African garments for men. Authentic dashikis, agbadas, and cultural attire.",
   generator: "v0.app",
+  icons: {
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
+  },
 }
 
 export default function RootLayout({
