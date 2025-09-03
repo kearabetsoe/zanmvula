@@ -46,7 +46,6 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Social Media */}
           <div>
             <h3 className="font-semibold text-lg mb-4">Follow Us</h3>
             <div className="flex items-center gap-4">
