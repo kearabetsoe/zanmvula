@@ -1,4 +1,4 @@
-import { Instagram, Phone, Mail, MapPin, Clock } from "lucide-react"
+import { Instagram, Phone, Mail, MapPin, Clock } from "lucide-react";
 
 export function Footer() {
   return (
@@ -15,11 +15,18 @@ export function Footer() {
               </div>
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4" />
-                <span>info@zanemvula.com</span>
+                <span>dboniwe@gmail.com</span>
               </div>
-              <div className="flex items-center gap-3">
-                <MapPin className="h-4 w-4" />
-                <span>123 Heritage Lane, Cultural District, NY 10001</span>
+              <div className="flex items-center gap-4">
+                <a
+                  href="https://www.google.com/maps/dir/?api=1&destination=-32.9149036,27.4195700"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:text-accent transition-colors"
+                >
+                  <MapPin className="h-4 w-4" />
+                  <span>Shop no 5 Zwelitsha Complex</span>
+                </a>
               </div>
             </div>
           </div>
@@ -54,17 +61,22 @@ export function Footer() {
               </a>
             </div>
             <p className="text-sm mt-4 text-primary-foreground/80">
-              Follow us for the latest traditional African fashion inspiration and custom garment showcases.
+              Follow us for the latest traditional African fashion inspiration
+              and custom garment showcases.
             </p>
           </div>
         </div>
 
         <div className="border-t border-primary-foreground/20 mt-8 pt-6 text-center">
           <p className="text-sm text-primary-foreground/80">
-            © 2025 Zanemvula. All rights reserved. Celebrating African heritage through traditional craftsmanship.
+            © 2025 Zanemvula. All rights reserved. Celebrating African heritage
+            through traditional craftsmanship.
+          </p>
+          <p className="text-xs text-primary-foreground/60 mt-2">
+            Developed by Subgen IT Solutions
           </p>
         </div>
       </div>
     </footer>
-  )
+  );
 }

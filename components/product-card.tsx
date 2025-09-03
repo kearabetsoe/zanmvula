@@ -1,39 +1,142 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Heart, ShoppingCart } from "lucide-react"
-import Link from "next/link"
+import { useState } from "react";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Heart, ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { useCart } from "@/components/cart-context";
+import { toast } from "sonner";
 
 interface Product {
-  id: number
-  name: string
-  price: number
-  category: string
-  size: string[]
-  color: string[]
-  image: string
-  description: string
+  id: number;
+  name: string;
+  images: string[];
+  pricing: {
+    waistcoat: number;
+    pants: number;
+    full: number;
+  };
+  category: string;
+  size: string[];
+  color: string[];
+  description: string;
 }
 
 interface ProductCardProps {
-  product: Product
+  product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
-  const [isLiked, setIsLiked] = useState(false)
+  const [isLiked, setIsLiked] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [selectedComponent, setSelectedComponent] = useState<
+    "waistcoat" | "pants" | "full"
+  >("full");
+  const [selectedSize, setSelectedSize] = useState<string>("");
+  const { addToCart } = useCart();
+
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex(
+      (prev) => (prev - 1 + product.images.length) % product.images.length
+    );
+  };
+
+  const getSelectedPrice = () => {
+    return product.pricing[selectedComponent];
+  };
+
+  const getComponentLabel = (component: string) => {
+    switch (component) {
+      case "waistcoat":
+        return "Waistcoat Only";
+      case "pants":
+        return "Pants Only";
+      case "full":
+        return "Full Attire";
+      default:
+        return component;
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      toast.error("Please select a size before adding to cart");
+      return;
+    }
+
+    addToCart({
+      productId: product.id,
+      productName: product.name,
+      component: selectedComponent,
+      price: getSelectedPrice(),
+      quantity: 1,
+      size: selectedSize,
+      image: product.images[0] || "/placeholder.svg",
+      category: product.category,
+    });
+
+    toast.success(`${getComponentLabel(selectedComponent)} added to cart!`);
+  };
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
       <CardContent className="p-0">
         <div className="relative overflow-hidden">
-          <img
-            src={product.image || "/placeholder.svg"}
-            alt={product.name}
-            className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+          <div className="relative h-64">
+            <img
+              src={product.images[currentImageIndex] || "/placeholder.svg"}
+              alt={`${product.name} - Image ${currentImageIndex + 1}`}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+
+            {product.images.length > 1 && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white h-8 w-8"
+                  onClick={prevImage}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white h-8 w-8"
+                  onClick={nextImage}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+
+            {product.images.length > 1 && (
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                {product.images.map((_, index) => (
+                  <button
+                    key={index}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      index === currentImageIndex ? "bg-white" : "bg-white/50"
+                    }`}
+                    onClick={() => setCurrentImageIndex(index)}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
           <Button
             variant="ghost"
             size="icon"
@@ -45,65 +148,122 @@ export function ProductCard({ product }: ProductCardProps) {
             <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
           </Button>
           <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground">
-            {product.category.charAt(0).toUpperCase() + product.category.slice(1)}
+            {product.category.charAt(0).toUpperCase() +
+              product.category.slice(1)}
           </Badge>
         </div>
 
         <div className="p-4">
-          <h3 className="font-semibold text-lg mb-2 text-balance">{product.name}</h3>
-          <p className="text-sm text-muted-foreground mb-3 text-pretty line-clamp-2">{product.description}</p>
+          <h3 className="font-semibold text-lg mb-2 text-balance">
+            {product.name}
+          </h3>
+          <p className="text-sm text-muted-foreground mb-3 text-pretty line-clamp-2">
+            {product.description}
+          </p>
 
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-2xl font-bold text-primary">${product.price}</span>
+          <div className="mb-4">
+            <span className="text-xs font-medium text-muted-foreground mb-2 block">
+              Choose Component:
+            </span>
+            <div className="grid grid-cols-3 gap-1">
+              {(["waistcoat", "pants", "full"] as const).map((component) => (
+                <Button
+                  key={component}
+                  variant={
+                    selectedComponent === component ? "default" : "outline"
+                  }
+                  size="sm"
+                  className="text-xs h-8"
+                  onClick={() => setSelectedComponent(component)}
+                >
+                  {getComponentLabel(component)}
+                </Button>
+              ))}
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <div>
-              <span className="text-xs font-medium text-muted-foreground">Available Sizes:</span>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {product.size.slice(0, 4).map((size) => (
-                  <Badge key={size} variant="outline" className="text-xs">
+          <div className="mb-4">
+            <span className="text-xs font-medium text-muted-foreground mb-2 block">
+              Select Size:
+            </span>
+            <Select value={selectedSize} onValueChange={setSelectedSize}>
+              <SelectTrigger className="h-8">
+                <SelectValue placeholder="Choose size" />
+              </SelectTrigger>
+              <SelectContent>
+                {product.size.map((size) => (
+                  <SelectItem key={size} value={size}>
                     {size}
-                  </Badge>
+                  </SelectItem>
                 ))}
-                {product.size.length > 4 && (
-                  <Badge variant="outline" className="text-xs">
-                    +{product.size.length - 4}
-                  </Badge>
-                )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-2xl font-bold text-primary">
+              ${getSelectedPrice()}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {getComponentLabel(selectedComponent)}
+            </span>
+          </div>
+
+          <div className="mb-3 p-2 bg-muted/50 rounded-lg">
+            <span className="text-xs font-medium text-muted-foreground block mb-1">
+              Pricing Options:
+            </span>
+            <div className="grid grid-cols-3 gap-2 text-xs">
+              <div className="text-center">
+                <div className="font-medium">Waistcoat</div>
+                <div className="text-primary">${product.pricing.waistcoat}</div>
+              </div>
+              <div className="text-center">
+                <div className="font-medium">Pants</div>
+                <div className="text-primary">${product.pricing.pants}</div>
+              </div>
+              <div className="text-center">
+                <div className="font-medium">Full Set</div>
+                <div className="text-primary font-bold">
+                  ${product.pricing.full}
+                </div>
               </div>
             </div>
+          </div>
 
-            <div>
-              <span className="text-xs font-medium text-muted-foreground">Colors:</span>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {product.color.slice(0, 3).map((color) => (
-                  <Badge key={color} variant="secondary" className="text-xs">
-                    {color}
-                  </Badge>
-                ))}
-                {product.color.length > 3 && (
-                  <Badge variant="secondary" className="text-xs">
-                    +{product.color.length - 3}
-                  </Badge>
-                )}
-              </div>
+          <div>
+            <span className="text-xs font-medium text-muted-foreground">
+              Available Sizes:
+            </span>
+            <div className="flex flex-wrap gap-1 mt-1">
+              {product.size.slice(0, 4).map((size) => (
+                <Badge key={size} variant="outline" className="text-xs">
+                  {size}
+                </Badge>
+              ))}
+              {product.size.length > 4 && (
+                <Badge variant="outline" className="text-xs">
+                  +{product.size.length - 4}
+                </Badge>
+              )}
             </div>
           </div>
         </div>
       </CardContent>
 
       <CardFooter className="p-4 pt-0 space-y-2">
-        <Button asChild className="w-full bg-primary hover:bg-primary/90">
-          <Link href={`/order?product=${product.id}`}>
-            <ShoppingCart className="h-4 w-4 mr-2" />
-            Order Now
-          </Link>
+        <Button
+          onClick={handleAddToCart}
+          className="w-full bg-primary hover:bg-primary/90"
+          disabled={!selectedSize}
+        >
+          <Plus className="h-4 w-4 mr-2" />
+          Add to Cart - ${getSelectedPrice()}
         </Button>
         <Button variant="outline" className="w-full bg-transparent">
           View Details
         </Button>
       </CardFooter>
     </Card>
-  )
+  );
 }
