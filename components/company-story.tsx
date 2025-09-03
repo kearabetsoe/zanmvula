@@ -12,9 +12,19 @@ export function CompanyStory() {
             Our Heritage
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
-            Rooted in African tradition and crafted with pride, Zanemvula has
-            been preserving and celebrating authentic African menswear since
-            2025, honoring our ancestors while embracing modern craftsmanship.
+            At Zanemvula, we believe in the power of heritage to shape identity
+            and inspire pride. Our name, which directly translates to “bring
+            rain” in isiXhosa, carries a deeper meaning—rain is life, rain is
+            growth, and rain is prosperity. In the same way, our work is
+            dedicated to nurturing cultural pride, dignity, and renewal.
+          </p>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty mt-3">
+            We specialize in crafting authentic Xhosa regalia for men, blending
+            tradition with modern craftsmanship. Each piece is designed with
+            respect for the rich cultural heritage of the amaXhosa while
+            embracing contemporary style and functionality. Zanemvula is more
+            than a brand—it is a cultural movement that honors the past while
+            celebrating the future.
           </p>
         </div>
 
@@ -22,28 +32,26 @@ export function CompanyStory() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
           <div>
             <img
-              src="/traditional-african-dashiki-shirt-in-royal-blue-wi.png"
+              src="/design-2-full-1.JPG"
               alt="Traditional African garments"
-              className="w-full h-96 object-cover rounded-lg shadow-lg"
+              className="w-full h-200 object-cover rounded-lg shadow-lg"
             />
           </div>
           <div className="space-y-6">
-            <h2 className="text-3xl font-bold text-balance">
-              Preserving Tradition Since 2025
-            </h2>
+            <h2 className="text-3xl font-bold text-balance">Our Inspiration</h2>
             <p className="text-muted-foreground text-pretty">
-              Founded by Kwame Asante, a master tailor from Ghana, Zanemvula
-              began as a mission to preserve and share the rich tradition of
-              African menswear. Growing up surrounded by the vibrant textiles
-              and time-honored techniques of his homeland, Kwame envisioned
-              bringing authentic African craftsmanship to men seeking to connect
-              with their heritage.
+              Our inspiration comes from the timeless beauty, wisdom, and
+              strength found within Xhosa traditions. Just as rain nourishes the
+              earth, culture nourishes the soul. By creating regalia that speaks
+              to both heritage and modern identity, we aim to inspire men to
+              wear their culture with pride and confidence.
             </p>
             <p className="text-muted-foreground text-pretty">
-              Today, we continue that legacy by creating custom traditional
-              garments using authentic patterns, premium fabrics, and techniques
-              passed down through generations. Each dashiki, agbada, and boubou
-              tells a story of cultural pride and artistic excellence.
+              We are inspired by the resilience of our ancestors, the rhythm of
+              African ceremonies, and the symbolism woven into every bead,
+              fabric, and pattern. Zanemvula is a celebration of prosperity,
+              unity, and growth—values that continue to guide us as we bring
+              tradition to life for today’s generation.
             </p>
             <Button asChild className="bg-primary hover:bg-primary/90">
               <Link href="/store">View Our Garments</Link>
