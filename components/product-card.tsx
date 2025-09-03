@@ -92,9 +92,9 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-      <CardContent className="p-0">
+      <CardContent className="p-0 -mt-6 rounded-lg">
         <div className="relative overflow-hidden">
-          <div className="relative h-64">
+          <div className="relative h-64 ">
             <img
               src={product.images[currentImageIndex] || "/placeholder.svg"}
               alt={`${product.name} - Image ${currentImageIndex + 1}`}
@@ -202,7 +202,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
           <div className="flex items-center justify-between mb-3">
             <span className="text-2xl font-bold text-primary">
-              ${getSelectedPrice()}
+              R{getSelectedPrice()}
             </span>
             <span className="text-xs text-muted-foreground">
               {getComponentLabel(selectedComponent)}
@@ -216,16 +216,16 @@ export function ProductCard({ product }: ProductCardProps) {
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div className="text-center">
                 <div className="font-medium">Waistcoat</div>
-                <div className="text-primary">${product.pricing.waistcoat}</div>
+                <div className="text-primary">R{product.pricing.waistcoat}</div>
               </div>
               <div className="text-center">
                 <div className="font-medium">Pants</div>
-                <div className="text-primary">${product.pricing.pants}</div>
+                <div className="text-primary">R{product.pricing.pants}</div>
               </div>
               <div className="text-center">
                 <div className="font-medium">Full Set</div>
                 <div className="text-primary font-bold">
-                  ${product.pricing.full}
+                  R{product.pricing.full}
                 </div>
               </div>
             </div>
@@ -258,7 +258,7 @@ export function ProductCard({ product }: ProductCardProps) {
           disabled={!selectedSize}
         >
           <Plus className="h-4 w-4 mr-2" />
-          Add to Cart - ${getSelectedPrice()}
+          Add to Cart - R{getSelectedPrice()}
         </Button>
         <Button variant="outline" className="w-full bg-transparent">
           View Details

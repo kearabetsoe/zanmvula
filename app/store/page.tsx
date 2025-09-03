@@ -6,117 +6,41 @@ import { ProductCard } from "@/components/product-card";
 const products = [
   {
     id: 1,
-    name: "Royal Blue Traditional Set",
+    name: "Cream Dark-Brown & Green Set",
     images: [
-      "/traditional-african-dashiki-shirt-in-royal-blue-wi.png",
-      "/traditional-african-dashiki-shirt-in-royal-blue-wi.png",
-      "/traditional-african-dashiki-shirt-in-royal-blue-wi.png",
+      "/design-1-full-1.JPG",
+      "/design-1-full-2.JPG",
+      "/design-1-top-1.JPG",
     ],
     pricing: {
-      waistcoat: 89.99,
-      pants: 69.99,
-      full: 149.99,
+      waistcoat: 550.00,
+      pants: 750.00,
+      full: 1300.00,
     },
     category: "traditional",
     size: ["S", "M", "L", "XL", "XXL"],
-    color: ["Royal Blue", "Gold Trim"],
+    color: ["Cream", "Dark-Brown", "Green"],
     description:
       "Handcrafted traditional set with intricate embroidery patterns. Perfect for cultural celebrations and formal occasions.",
   },
   {
     id: 2,
-    name: "Cream & Gold Ceremonial Set",
+    name: "Cream Dark-Brown & Orange Set",
     images: [
-      "/elegant-african-agbada-robe-in-cream-with-gold-emb.png",
-      "/elegant-african-agbada-robe-in-cream-with-gold-emb.png",
-      "/elegant-african-agbada-robe-in-cream-with-gold-emb.png",
+      "/design-2-full-1.JPG",
+      "/design-2-top-1.JPG",
+      "/design-2-top-2.JPG",
     ],
     pricing: {
-      waistcoat: 129.99,
-      pants: 89.99,
-      full: 199.99,
+      waistcoat: 550.00,
+      pants: 750.00,
+      full: 1300.00,
     },
     category: "traditional",
     size: ["M", "L", "XL", "XXL"],
-    color: ["Cream", "Gold", "Brown"],
+    color: ["Cream", "Dark-Brown", "Orange"],
     description:
       "Majestic ceremonial set with traditional embroidery. Ideal for weddings, ceremonies, and special events.",
-  },
-  {
-    id: 3,
-    name: "Kente Pattern Traditional Set",
-    images: [
-      "/traditional-kente-vest-with-authentic-african-patt.png",
-      "/traditional-kente-vest-with-authentic-african-patt.png",
-      "/traditional-kente-vest-with-authentic-african-patt.png",
-    ],
-    pricing: {
-      waistcoat: 109.99,
-      pants: 79.99,
-      full: 169.99,
-    },
-    category: "traditional",
-    size: ["S", "M", "L", "XL"],
-    color: ["Multi-colored Kente"],
-    description:
-      "Authentic kente set featuring traditional Ghanaian patterns. Each piece tells a unique cultural story.",
-  },
-  {
-    id: 4,
-    name: "Earth Tones Elegant Set",
-    images: [
-      "/traditional-african-boubou-kaftan-in-earth-tones.png",
-      "/traditional-african-boubou-kaftan-in-earth-tones.png",
-      "/traditional-african-boubou-kaftan-in-earth-tones.png",
-    ],
-    pricing: {
-      waistcoat: 99.99,
-      pants: 74.99,
-      full: 159.99,
-    },
-    category: "traditional",
-    size: ["L", "XL", "XXL"],
-    color: ["Brown", "Tan", "Orange"],
-    description:
-      "Comfortable and elegant set in rich earth tones. Perfect for both casual and formal wear.",
-  },
-  {
-    id: 5,
-    name: "Ankara Print Traditional Set",
-    images: [
-      "/colorful-african-ankara-print-shirt-with-tradition.png",
-      "/colorful-african-ankara-print-shirt-with-tradition.png",
-      "/colorful-african-ankara-print-shirt-with-tradition.png",
-    ],
-    pricing: {
-      waistcoat: 79.99,
-      pants: 59.99,
-      full: 129.99,
-    },
-    category: "traditional",
-    size: ["S", "M", "L", "XL", "XXL"],
-    color: ["Various Ankara Prints"],
-    description:
-      "Vibrant ankara print set featuring bold African patterns. Custom tailored for the perfect fit.",
-  },
-  {
-    id: 6,
-    name: "Grand Ceremonial White Set",
-    images: [
-      "/grand-ceremonial-african-boubou-in-white-with-gold.png",
-      "/grand-ceremonial-african-boubou-in-white-with-gold.png",
-      "/grand-ceremonial-african-boubou-in-white-with-gold.png",
-    ],
-    pricing: {
-      waistcoat: 159.99,
-      pants: 119.99,
-      full: 259.99,
-    },
-    category: "traditional",
-    size: ["L", "XL", "XXL"],
-    color: ["White", "Gold", "Black"],
-    description:
-      "Luxurious ceremonial set with exquisite hand-embroidered details. Perfect for special occasions.",
   },
 ];
 
@@ -146,7 +70,7 @@ export default function GalleryPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
             {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
