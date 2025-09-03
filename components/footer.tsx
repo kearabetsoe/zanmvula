@@ -38,9 +38,9 @@ export function Footer() {
               <div className="flex items-center gap-3">
                 <Clock className="h-4 w-4" />
                 <div>
-                  <p>Mon - Fri: 9:00 AM - 7:00 PM</p>
-                  <p>Sat: 10:00 AM - 6:00 PM</p>
-                  <p>Sun: 12:00 PM - 5:00 PM</p>
+                  <p>Mon - Fri: 9:00 AM - 6:00 PM</p>
+                  <p>Sat: 09:00 AM - 4:00 PM</p>
+                  <p>Sun: Closed</p>
                 </div>
               </div>
             </div>
