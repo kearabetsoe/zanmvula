@@ -63,14 +63,14 @@ export function Navigation() {
           >
             <div className="flex flex-col h-full">
               <div className="flex items-center justify-center p-6 border-b">
-                <Button
+                {/* <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsOpen(false)}
                   className="h-8 w-8"
                 >
                   <X className="h-5 w-5" />
-                </Button>
+                </Button> */}
               </div>
 
               <nav className="flex flex-col p-6 space-y-1">
