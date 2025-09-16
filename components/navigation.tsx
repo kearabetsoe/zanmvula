@@ -106,9 +106,6 @@ export function Navigation() {
             height={80}
             className="h-12 w-12 md:h-20 md:w-20 object-contain"
           />
-          <span className="text-lg md:text-xl font-bold text-primary">
-            Zanemvula
-          </span>
         </Link>
 
         <Link href="/cart" className="md:hidden relative">
