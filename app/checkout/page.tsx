@@ -207,6 +207,7 @@ export default function CheckoutPage() {
           </CardContent>
         </Card>
       </div>
+      //end div
     );
   }
 
