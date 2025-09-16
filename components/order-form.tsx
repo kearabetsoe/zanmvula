@@ -15,17 +15,103 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import {
   CheckCircle,
-  Package,
   User,
   MapPin,
   Ruler,
+  ShoppingCart,
   Trash2,
   Plus,
-  Minus,
+  ArrowLeft,
 } from "lucide-react";
-import { useCart } from "@/components/cart-context";
+
+const products = [
+  {
+    id: 1,
+    name: "Royal Blue Dashiki",
+    pricing: {
+      waistcoat: 189.99,
+      pants: 149.99,
+      full: 299.99,
+    },
+    image: "/traditional-african-dashiki-shirt-in-royal-blue-wi.png",
+    category: "dashiki",
+    description: "Traditional West African dashiki with intricate embroidery",
+  },
+  {
+    id: 2,
+    name: "Elegant Agbada Robe",
+    pricing: {
+      waistcoat: 249.99,
+      pants: 199.99,
+      full: 399.99,
+    },
+    image: "/elegant-african-agbada-robe-in-cream-with-gold-emb.png",
+    category: "agbada",
+    description: "Flowing ceremonial robe with gold embroidery",
+  },
+  {
+    id: 3,
+    name: "Kente Pattern Vest",
+    pricing: {
+      waistcoat: 159.99,
+      pants: 129.99,
+      full: 249.99,
+    },
+    image: "/traditional-kente-vest-with-authentic-african-patt.png",
+    category: "kente",
+    description: "Authentic Kente cloth vest with traditional patterns",
+  },
+  {
+    id: 4,
+    name: "Earth Tone Boubou",
+    pricing: {
+      waistcoat: 199.99,
+      pants: 159.99,
+      full: 319.99,
+    },
+    image: "/traditional-african-boubou-kaftan-in-earth-tones.png",
+    category: "boubou",
+    description: "Comfortable kaftan-style boubou in natural earth tones",
+  },
+  {
+    id: 5,
+    name: "Ankara Print Shirt",
+    pricing: {
+      waistcoat: 119.99,
+      pants: 99.99,
+      full: 189.99,
+    },
+    image: "/colorful-african-ankara-print-shirt-with-tradition.png",
+    category: "ankara",
+    description: "Vibrant Ankara print shirt with traditional motifs",
+  },
+  {
+    id: 6,
+    name: "Ceremonial Grand Boubou",
+    pricing: {
+      waistcoat: 349.99,
+      pants: 299.99,
+      full: 599.99,
+    },
+    image: "/grand-ceremonial-african-boubou-in-white-with-gold.png",
+    category: "ceremonial",
+    description: "Grand ceremonial boubou for special occasions",
+  },
+];
+
+interface CartItem {
+  id: string;
+  productId: number;
+  productName: string;
+  component: "waistcoat" | "pants" | "full";
+  price: number;
+  quantity: number;
+  size: string;
+  image: string;
+}
 
 interface OrderFormData {
   // Customer Details
@@ -41,10 +127,6 @@ interface OrderFormData {
   zipCode: string;
   country: string;
 
-  // Product Details
-  size: string;
-  quantity: number;
-
   // Measurements
   chest: string;
   waist: string;
@@ -53,22 +135,21 @@ interface OrderFormData {
   sleeves: string;
   inseam: string;
   specialRequests: string;
-
-  // Component Selection
-  component: "waistcoat" | "pants" | "full";
 }
 
 export function OrderForm() {
-  const { items, updateQuantity, removeFromCart, clearCart, getTotalPrice } =
-    useCart();
   const searchParams = useSearchParams();
   const productId = searchParams.get("product");
   const componentParam =
     (searchParams.get("component") as "waistcoat" | "pants" | "full") || "full";
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<
+    (typeof products)[0] | null
+  >(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
-  const [formData, setFormData] = useState<Omit<OrderFormData, "color">>({
+  const [formData, setFormData] = useState<OrderFormData>({
     firstName: "",
     lastName: "",
     email: "",
@@ -78,8 +159,6 @@ export function OrderForm() {
     state: "",
     zipCode: "",
     country: "",
-    size: "",
-    quantity: 1,
     chest: "",
     waist: "",
     hips: "",
@@ -87,24 +166,98 @@ export function OrderForm() {
     sleeves: "",
     inseam: "",
     specialRequests: "",
-    component: componentParam,
+  });
+
+  const [currentItem, setCurrentItem] = useState({
+    component: componentParam as "waistcoat" | "pants" | "full",
+    quantity: 1,
+    size: "",
   });
 
   useEffect(() => {
     if (productId) {
-      const product = items.find((p) => p.id === productId);
+      const product = products.find((p) => p.id === Number.parseInt(productId));
       if (product) {
-        // setSelectedProduct(product)
+        setSelectedProduct(product);
       }
     }
-    setFormData((prev) => ({ ...prev, component: componentParam }));
+    setCurrentItem((prev) => ({ ...prev, component: componentParam }));
   }, [productId, componentParam]);
 
+  useEffect(() => {
+    const savedCart = localStorage.getItem("zanemvula-cart");
+    if (savedCart) {
+      try {
+        setCart(JSON.parse(savedCart));
+      } catch (error) {
+        console.error("Failed to load cart from localStorage:", error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (cart.length > 0) {
+      localStorage.setItem("zanemvula-cart", JSON.stringify(cart));
+    } else {
+      localStorage.removeItem("zanemvula-cart");
+    }
+  }, [cart]);
+
   const updateFormData = (
-    field: keyof Omit<OrderFormData, "color">,
+    field: keyof OrderFormData,
     value: string | number
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const updateCurrentItem = (
+    field: keyof typeof currentItem,
+    value: string | number
+  ) => {
+    setCurrentItem((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const addToCart = () => {
+    if (!selectedProduct) return;
+
+    const cartItem: CartItem = {
+      id: `${selectedProduct.id}-${currentItem.component}-${Date.now()}`,
+      productId: selectedProduct.id,
+      productName: selectedProduct.name,
+      component: currentItem.component,
+      price: selectedProduct.pricing[currentItem.component],
+      quantity: currentItem.quantity,
+      size: currentItem.size,
+      image: selectedProduct.image,
+    };
+
+    setCart((prev) => [...prev, cartItem]);
+
+    setCurrentItem({
+      component: "full",
+      quantity: 1,
+      size: "",
+    });
+
+    alert("Item added to cart successfully!");
+    setTimeout(() => {
+      window.location.href = "/gallery";
+    }, 1000);
+  };
+
+  const removeFromCart = (itemId: string) => {
+    setCart((prev) => prev.filter((item) => item.id !== itemId));
+  };
+
+  const updateCartItemQuantity = (itemId: string, quantity: number) => {
+    if (quantity < 1) return;
+    setCart((prev) =>
+      prev.map((item) => (item.id === itemId ? { ...item, quantity } : item))
+    );
+  };
+
+  const getCartTotal = () => {
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
   };
 
   const nextStep = () => {
@@ -120,9 +273,27 @@ export function OrderForm() {
   };
 
   const handleSubmit = () => {
-    console.log("Order submitted:", { items, formData });
+    console.log("Order submitted:", { cart, formData });
+    localStorage.removeItem("zanemvula-cart");
     setIsSubmitted(true);
-    clearCart();
+  };
+
+  const getCurrentPrice = () => {
+    if (!selectedProduct) return 0;
+    return selectedProduct.pricing[currentItem.component];
+  };
+
+  const getComponentDisplayName = (component: string) => {
+    switch (component) {
+      case "waistcoat":
+        return "Waistcoat Only";
+      case "pants":
+        return "Pants Only";
+      case "full":
+        return "Full Attire Set";
+      default:
+        return "Full Attire Set";
+    }
   };
 
   if (isSubmitted) {
@@ -155,29 +326,8 @@ export function OrderForm() {
     );
   }
 
-  if (items.length === 0) {
-    return (
-      <Card className="max-w-2xl mx-auto text-center">
-        <CardContent className="p-8">
-          <Package className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">Your cart is empty</h2>
-          <p className="text-muted-foreground mb-6">
-            Add some traditional garments to your cart to continue with your
-            order.
-          </p>
-          <Button
-            onClick={() => (window.location.href = "/gallery")}
-            className="bg-primary hover:bg-primary/90"
-          >
-            Browse Gallery
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
   const steps = [
-    { number: 1, title: "Cart Review", icon: Package },
+    { number: 1, title: "Cart & Items", icon: ShoppingCart },
     { number: 2, title: "Personal Info", icon: User },
     { number: 3, title: "Address", icon: MapPin },
     { number: 4, title: "Measurements", icon: Ruler },
@@ -185,7 +335,17 @@ export function OrderForm() {
 
   return (
     <div className="space-y-6">
-      {/* Progress Steps */}
+      <div className="flex items-center gap-2 px-2 sm:px-0">
+        <Button
+          variant="outline"
+          onClick={() => (window.location.href = "/gallery")}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Gallery
+        </Button>
+      </div>
+
       <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-2 lg:space-x-4 mb-8 px-2">
         {steps.map((step, index) => (
           <div key={step.number} className="flex items-center w-full sm:w-auto">
@@ -218,95 +378,229 @@ export function OrderForm() {
         ))}
       </div>
 
-      {/* Step 1: Cart Review */}
       {currentStep === 1 && (
-        <Card className="mx-2 sm:mx-0">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Package className="h-5 w-5" />
-              Review Your Cart
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 p-4 sm:p-6">
-            {items.map((item) => (
-              <div
-                key={item.id}
-                className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 bg-muted rounded-lg"
-              >
-                <img
-                  src={item.image || "/placeholder.svg"}
-                  alt={item.productName}
-                  className="w-full sm:w-20 h-48 sm:h-20 object-cover rounded"
-                />
-                <div className="flex-1 w-full">
-                  <h3 className="font-semibold text-lg sm:text-base">
-                    {item.productName}
-                  </h3>
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-2">
-                    <div className="flex flex-col">
-                      <p className="text-lg font-bold text-primary">
-                        ${item.price}
-                      </p>
-                      <p className="text-sm text-muted-foreground capitalize">
-                        {item.component === "full"
-                          ? "Full Attire"
-                          : item.component}{" "}
-                        - Size: {item.size}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 bg-transparent"
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
-                        }
-                      >
-                        <Minus className="h-4 w-4" />
-                      </Button>
-                      <span className="w-8 text-center">{item.quantity}</span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 bg-transparent"
-                        onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
-                        }
-                      >
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 text-destructive hover:text-destructive bg-transparent"
-                        onClick={() => removeFromCart(item.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+        <div className="space-y-6">
+          {selectedProduct && (
+            <Card className="mx-2 sm:mx-0">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Plus className="h-5 w-5" />
+                  Add Item to Cart
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6 p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-4 p-4 bg-muted rounded-lg">
+                  <img
+                    src={selectedProduct.image || "/placeholder.svg"}
+                    alt={selectedProduct.name}
+                    className="w-full sm:w-20 h-48 sm:h-20 object-cover rounded"
+                  />
+                  <div className="flex-1 w-full">
+                    <h3 className="font-semibold text-lg sm:text-base">
+                      {selectedProduct.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-2">
+                      {selectedProduct.description}
+                    </p>
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                      <div className="flex flex-col">
+                        <p className="text-2xl font-bold text-primary">
+                          ${getCurrentPrice()}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {getComponentDisplayName(currentItem.component)}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className="capitalize w-fit">
+                        {selectedProduct.category}
+                      </Badge>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
 
-            <div className="bg-primary/5 p-4 rounded-lg border-l-4 border-primary">
-              <div className="flex justify-between items-center">
-                <span className="text-lg font-semibold">Total Amount:</span>
-                <span className="text-2xl font-bold text-primary">
-                  ${getTotalPrice().toFixed(2)}
-                </span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">
-                *Final pricing may vary based on custom measurements and
-                traditional embellishments
+                <div className="space-y-4">
+                  <div>
+                    <Label>Select Component</Label>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
+                      {(["waistcoat", "pants", "full"] as const).map(
+                        (component) => (
+                          <div
+                            key={component}
+                            className={`p-3 border rounded-lg cursor-pointer transition-colors ${
+                              currentItem.component === component
+                                ? "border-primary bg-primary/5"
+                                : "border-muted hover:border-primary/50"
+                            }`}
+                            onClick={() =>
+                              updateCurrentItem("component", component)
+                            }
+                          >
+                            <div className="text-center">
+                              <p className="font-medium capitalize">
+                                {component === "full"
+                                  ? "Full Attire"
+                                  : component}
+                              </p>
+                              <p className="text-sm text-primary font-semibold">
+                                ${selectedProduct.pricing[component]}
+                              </p>
+                            </div>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="size">Base Size (for reference)</Label>
+                      <Select
+                        value={currentItem.size}
+                        onValueChange={(value) =>
+                          updateCurrentItem("size", value)
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select base size" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="S">Small (36-38)</SelectItem>
+                          <SelectItem value="M">Medium (40-42)</SelectItem>
+                          <SelectItem value="L">Large (44-46)</SelectItem>
+                          <SelectItem value="XL">X-Large (48-50)</SelectItem>
+                          <SelectItem value="XXL">XX-Large (52-54)</SelectItem>
+                          <SelectItem value="XXXL">
+                            XXX-Large (56-58)
+                          </SelectItem>
+                          <SelectItem value="Custom">Custom Size</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label htmlFor="quantity">Quantity</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        value={currentItem.quantity}
+                        onChange={(e) =>
+                          updateCurrentItem(
+                            "quantity",
+                            Number.parseInt(e.target.value) || 1
+                          )
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <Button
+                    onClick={addToCart}
+                    className="w-full bg-primary hover:bg-primary/90"
+                    disabled={!currentItem.size}
+                  >
+                    Add to Cart - $
+                    {(getCurrentPrice() * currentItem.quantity).toFixed(2)}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <Card className="mx-2 sm:mx-0">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingCart className="h-5 w-5" />
+                Your Cart ({cart.length} items)
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Your cart is automatically saved. You can continue shopping and
+                come back anytime.
               </p>
-            </div>
-          </CardContent>
-        </Card>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6">
+              {cart.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <ShoppingCart className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Your cart is empty. Browse our gallery to add items.</p>
+                  <Button
+                    variant="outline"
+                    className="mt-4 bg-transparent"
+                    onClick={() => (window.location.href = "/gallery")}
+                  >
+                    Browse Gallery
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {cart.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 border rounded-lg"
+                    >
+                      <img
+                        src={item.image || "/placeholder.svg"}
+                        alt={item.productName}
+                        className="w-full sm:w-16 h-32 sm:h-16 object-cover rounded"
+                      />
+                      <div className="flex-1 w-full">
+                        <h4 className="font-medium">{item.productName}</h4>
+                        <p className="text-sm text-muted-foreground">
+                          {getComponentDisplayName(item.component)}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Size: {item.size}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 w-full sm:w-auto">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            updateCartItemQuantity(item.id, item.quantity - 1)
+                          }
+                        >
+                          -
+                        </Button>
+                        <span className="w-8 text-center">{item.quantity}</span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            updateCartItemQuantity(item.id, item.quantity + 1)
+                          }
+                        >
+                          +
+                        </Button>
+                      </div>
+                      <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+                        <span className="font-semibold">
+                          ${(item.price * item.quantity).toFixed(2)}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeFromCart(item.id)}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+
+                  <Separator />
+
+                  <div className="flex justify-between items-center text-lg font-bold">
+                    <span>Total:</span>
+                    <span>${getCartTotal().toFixed(2)}</span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       )}
 
-      {/* Step 2: Personal Information */}
       {currentStep === 2 && (
         <Card className="mx-2 sm:mx-0">
           <CardHeader>
@@ -362,7 +656,6 @@ export function OrderForm() {
         </Card>
       )}
 
-      {/* Step 3: Address */}
       {currentStep === 3 && (
         <Card className="mx-2 sm:mx-0">
           <CardHeader>
@@ -437,7 +730,6 @@ export function OrderForm() {
         </Card>
       )}
 
-      {/* Step 4: Measurements */}
       {currentStep === 4 && (
         <Card className="mx-2 sm:mx-0">
           <CardHeader>
@@ -447,102 +739,66 @@ export function OrderForm() {
             </CardTitle>
             <p className="text-sm text-muted-foreground">
               Please provide measurements for your custom garments. Our master
-              tailors will use these for all items in your order.
+              tailors will use these for all items in your cart. Leave blank if
+              unsure - we'll schedule a consultation.
             </p>
           </CardHeader>
           <CardContent className="space-y-4 p-4 sm:p-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {items.map((item) => (
-                <div key={item.id}>
-                  {(item.component === "waistcoat" ||
-                    item.component === "full") && (
-                    <>
-                      <div>
-                        <Label htmlFor={`chest-${item.id}`}>
-                          Chest/Bust (inches)
-                        </Label>
-                        <Input
-                          id={`chest-${item.id}`}
-                          value={formData.chest}
-                          onChange={(e) =>
-                            updateFormData("chest", e.target.value)
-                          }
-                          placeholder="e.g., 42"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`shoulders-${item.id}`}>
-                          Shoulder Width (inches)
-                        </Label>
-                        <Input
-                          id={`shoulders-${item.id}`}
-                          value={formData.shoulders}
-                          onChange={(e) =>
-                            updateFormData("shoulders", e.target.value)
-                          }
-                          placeholder="e.g., 19"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`sleeves-${item.id}`}>
-                          Arm Length (inches)
-                        </Label>
-                        <Input
-                          id={`sleeves-${item.id}`}
-                          value={formData.sleeves}
-                          onChange={(e) =>
-                            updateFormData("sleeves", e.target.value)
-                          }
-                          placeholder="e.g., 26"
-                        />
-                      </div>
-                    </>
-                  )}
-
-                  {(item.component === "pants" ||
-                    item.component === "full") && (
-                    <>
-                      <div>
-                        <Label htmlFor={`waist-${item.id}`}>
-                          Waist (inches)
-                        </Label>
-                        <Input
-                          id={`waist-${item.id}`}
-                          value={formData.waist}
-                          onChange={(e) =>
-                            updateFormData("waist", e.target.value)
-                          }
-                          placeholder="e.g., 34"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`hips-${item.id}`}>Hips (inches)</Label>
-                        <Input
-                          id={`hips-${item.id}`}
-                          value={formData.hips}
-                          onChange={(e) =>
-                            updateFormData("hips", e.target.value)
-                          }
-                          placeholder="e.g., 40"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor={`inseam-${item.id}`}>
-                          Inseam Length (inches)
-                        </Label>
-                        <Input
-                          id={`inseam-${item.id}`}
-                          value={formData.inseam}
-                          onChange={(e) =>
-                            updateFormData("inseam", e.target.value)
-                          }
-                          placeholder="e.g., 32"
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-              ))}
+              <div>
+                <Label htmlFor="chest">Chest/Bust (inches)</Label>
+                <Input
+                  id="chest"
+                  value={formData.chest}
+                  onChange={(e) => updateFormData("chest", e.target.value)}
+                  placeholder="e.g., 42"
+                />
+              </div>
+              <div>
+                <Label htmlFor="waist">Waist (inches)</Label>
+                <Input
+                  id="waist"
+                  value={formData.waist}
+                  onChange={(e) => updateFormData("waist", e.target.value)}
+                  placeholder="e.g., 34"
+                />
+              </div>
+              <div>
+                <Label htmlFor="hips">Hips (inches)</Label>
+                <Input
+                  id="hips"
+                  value={formData.hips}
+                  onChange={(e) => updateFormData("hips", e.target.value)}
+                  placeholder="e.g., 40"
+                />
+              </div>
+              <div>
+                <Label htmlFor="shoulders">Shoulder Width (inches)</Label>
+                <Input
+                  id="shoulders"
+                  value={formData.shoulders}
+                  onChange={(e) => updateFormData("shoulders", e.target.value)}
+                  placeholder="e.g., 19"
+                />
+              </div>
+              <div>
+                <Label htmlFor="sleeves">Arm Length (inches)</Label>
+                <Input
+                  id="sleeves"
+                  value={formData.sleeves}
+                  onChange={(e) => updateFormData("sleeves", e.target.value)}
+                  placeholder="e.g., 26"
+                />
+              </div>
+              <div>
+                <Label htmlFor="inseam">Inseam Length (inches)</Label>
+                <Input
+                  id="inseam"
+                  value={formData.inseam}
+                  onChange={(e) => updateFormData("inseam", e.target.value)}
+                  placeholder="e.g., 32"
+                />
+              </div>
             </div>
 
             <Separator />
@@ -562,36 +818,41 @@ export function OrderForm() {
               />
             </div>
 
-            <div className="bg-muted p-4 rounded-lg border-l-4 border-primary">
-              <h4 className="font-semibold mb-2">Order Summary</h4>
-              {items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex justify-between items-center mb-2"
-                >
-                  <span className="text-sm">
-                    {item.productName} -{" "}
-                    {item.component === "full" ? "Full Attire" : item.component}{" "}
-                    × {item.quantity}
-                  </span>
-                  <span className="font-semibold">
-                    ${(item.price * item.quantity).toFixed(2)}
-                  </span>
+            {cart.length > 0 && (
+              <div className="bg-muted p-4 rounded-lg border-l-4 border-primary">
+                <h4 className="font-semibold mb-2">Order Summary</h4>
+                <div className="space-y-2">
+                  {cart.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex justify-between items-center text-sm"
+                    >
+                      <span>
+                        {item.productName} -{" "}
+                        {getComponentDisplayName(item.component)} ×{" "}
+                        {item.quantity}
+                      </span>
+                      <span className="font-semibold">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-              <Separator className="my-2" />
-              <div className="flex justify-between items-center">
-                <span className="font-bold">Total:</span>
-                <span className="font-bold text-lg text-primary">
-                  ${getTotalPrice().toFixed(2)}
-                </span>
+                <Separator className="my-2" />
+                <div className="flex justify-between items-center font-bold text-lg">
+                  <span>Total:</span>
+                  <span>${getCartTotal().toFixed(2)}</span>
+                </div>
+                <div className="text-xs text-muted-foreground mt-2 italic">
+                  *Final pricing may vary based on custom measurements and
+                  traditional embellishments
+                </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       )}
 
-      {/* Navigation Buttons */}
       <div className="flex justify-between px-2 sm:px-0 gap-4">
         <Button
           variant="outline"
@@ -606,13 +867,15 @@ export function OrderForm() {
           <Button
             onClick={nextStep}
             className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none"
+            disabled={currentStep === 1 && cart.length === 0}
           >
-            Next Step
+            {currentStep === 1 ? "Proceed to Checkout" : "Next Step"}
           </Button>
         ) : (
           <Button
             onClick={handleSubmit}
             className="bg-primary hover:bg-primary/90 flex-1 sm:flex-none"
+            disabled={cart.length === 0}
           >
             Submit Order
           </Button>

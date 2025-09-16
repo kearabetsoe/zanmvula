@@ -5,15 +5,15 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Heart, ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { useCart } from "@/components/cart-context";
-import { toast } from "sonner";
+  Heart,
+  ShoppingCart,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Plus,
+  Minus,
+} from "lucide-react";
+import Link from "next/link";
 
 interface Product {
   id: number;
@@ -22,7 +22,7 @@ interface Product {
   pricing: {
     waistcoat: number;
     pants: number;
-    full: number;
+    fullAttire: number;
   };
   category: string;
   size: string[];
@@ -38,10 +38,11 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [selectedComponent, setSelectedComponent] = useState<
-    "waistcoat" | "pants" | "full"
-  >("full");
-  const [selectedSize, setSelectedSize] = useState<string>("");
-  const { addToCart } = useCart();
+    "waistcoat" | "pants" | "fullAttire"
+  >("fullAttire");
+  const [isAddedToCart, setIsAddedToCart] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(product.size[0] || "M");
+  const [quantity, setQuantity] = useState(1);
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % product.images.length);
@@ -63,7 +64,7 @@ export function ProductCard({ product }: ProductCardProps) {
         return "Waistcoat Only";
       case "pants":
         return "Pants Only";
-      case "full":
+      case "fullAttire":
         return "Full Attire";
       default:
         return component;
@@ -71,30 +72,58 @@ export function ProductCard({ product }: ProductCardProps) {
   };
 
   const handleAddToCart = () => {
-    if (!selectedSize) {
-      toast.error("Please select a size before adding to cart");
-      return;
-    }
-
-    addToCart({
+    console.log("[v0] Adding item to cart:", {
       productId: product.id,
-      productName: product.name,
-      component: selectedComponent,
+      selectedComponent,
+      selectedSize,
+      quantity,
       price: getSelectedPrice(),
-      quantity: 1,
-      size: selectedSize,
-      image: product.images[0] || "/placeholder.svg",
-      category: product.category,
     });
 
-    toast.success(`${getComponentLabel(selectedComponent)} added to cart!`);
+    const cartItem = {
+      id: `${product.id}-${selectedComponent}-${selectedSize}-${Date.now()}`,
+      productId: product.id,
+      productName: product.name,
+      component:
+        selectedComponent === "fullAttire" ? "full" : selectedComponent,
+      price: getSelectedPrice(),
+      quantity: quantity,
+      size: selectedSize,
+      image: product.images[0],
+    };
+
+    console.log("[v0] Cart item created:", cartItem);
+
+    try {
+      const existingCart = JSON.parse(
+        localStorage.getItem("zanemvula-cart") || "[]"
+      );
+      console.log("[v0] Existing cart:", existingCart);
+
+      const updatedCart = [...existingCart, cartItem];
+      console.log("[v0] Updated cart:", updatedCart);
+
+      localStorage.setItem("zanemvula-cart", JSON.stringify(updatedCart));
+      console.log("[v0] Cart saved to localStorage");
+
+      setIsAddedToCart(true);
+      setTimeout(() => setIsAddedToCart(false), 2000);
+
+      const cartEvent = new CustomEvent("cartUpdated", {
+        detail: { cart: updatedCart, newItem: cartItem },
+      });
+      window.dispatchEvent(cartEvent);
+      console.log("[v0] Cart updated event dispatched");
+    } catch (error) {
+      console.error("[v0] Error adding item to cart:", error);
+    }
   };
 
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
-      <CardContent className="p-0 -mt-6 rounded-lg">
+      <CardContent className="p-0">
         <div className="relative overflow-hidden">
-          <div className="relative h-64 ">
+          <div className="relative h-64">
             <img
               src={product.images[currentImageIndex] || "/placeholder.svg"}
               alt={`${product.name} - Image ${currentImageIndex + 1}`}
@@ -166,19 +195,21 @@ export function ProductCard({ product }: ProductCardProps) {
               Choose Component:
             </span>
             <div className="grid grid-cols-3 gap-1">
-              {(["waistcoat", "pants", "full"] as const).map((component) => (
-                <Button
-                  key={component}
-                  variant={
-                    selectedComponent === component ? "default" : "outline"
-                  }
-                  size="sm"
-                  className="text-xs h-8"
-                  onClick={() => setSelectedComponent(component)}
-                >
-                  {getComponentLabel(component)}
-                </Button>
-              ))}
+              {(["waistcoat", "pants", "fullAttire"] as const).map(
+                (component) => (
+                  <Button
+                    key={component}
+                    variant={
+                      selectedComponent === component ? "default" : "outline"
+                    }
+                    size="sm"
+                    className="text-xs h-8"
+                    onClick={() => setSelectedComponent(component)}
+                  >
+                    {getComponentLabel(component)}
+                  </Button>
+                )
+              )}
             </div>
           </div>
 
@@ -186,26 +217,55 @@ export function ProductCard({ product }: ProductCardProps) {
             <span className="text-xs font-medium text-muted-foreground mb-2 block">
               Select Size:
             </span>
-            <Select value={selectedSize} onValueChange={setSelectedSize}>
-              <SelectTrigger className="h-8">
-                <SelectValue placeholder="Choose size" />
-              </SelectTrigger>
-              <SelectContent>
-                {product.size.map((size) => (
-                  <SelectItem key={size} value={size}>
-                    {size}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-wrap gap-1">
+              {product.size.map((size) => (
+                <Button
+                  key={size}
+                  variant={selectedSize === size ? "default" : "outline"}
+                  size="sm"
+                  className="text-xs h-8 min-w-[40px]"
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <span className="text-xs font-medium text-muted-foreground mb-2 block">
+              Quantity:
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0 bg-transparent"
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                disabled={quantity <= 1}
+              >
+                <Minus className="h-3 w-3" />
+              </Button>
+              <span className="text-sm font-medium min-w-[20px] text-center">
+                {quantity}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 w-8 p-0 bg-transparent"
+                onClick={() => setQuantity(quantity + 1)}
+              >
+                <Plus className="h-3 w-3" />
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center justify-between mb-3">
             <span className="text-2xl font-bold text-primary">
-              R{getSelectedPrice()}
+              R{(getSelectedPrice() * quantity).toFixed(2)}
             </span>
             <span className="text-xs text-muted-foreground">
-              {getComponentLabel(selectedComponent)}
+              {getComponentLabel(selectedComponent)} × {quantity}
             </span>
           </div>
 
@@ -216,36 +276,56 @@ export function ProductCard({ product }: ProductCardProps) {
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div className="text-center">
                 <div className="font-medium">Waistcoat</div>
-                <div className="text-primary">R{product.pricing.waistcoat}</div>
+                <div className="text-primary font-bold">R{product.pricing.waistcoat}</div>
               </div>
               <div className="text-center">
                 <div className="font-medium">Pants</div>
-                <div className="text-primary">R{product.pricing.pants}</div>
+                <div className="text-primary font-bold">R{product.pricing.pants}</div>
               </div>
               <div className="text-center">
                 <div className="font-medium">Full Set</div>
                 <div className="text-primary font-bold">
-                  R{product.pricing.full}
+                  R {product.pricing.fullAttire}
                 </div>
               </div>
             </div>
           </div>
 
-          <div>
-            <span className="text-xs font-medium text-muted-foreground">
-              Available Sizes:
-            </span>
-            <div className="flex flex-wrap gap-1 mt-1">
-              {product.size.slice(0, 4).map((size) => (
-                <Badge key={size} variant="outline" className="text-xs">
-                  {size}
-                </Badge>
-              ))}
-              {product.size.length > 4 && (
-                <Badge variant="outline" className="text-xs">
-                  +{product.size.length - 4}
-                </Badge>
-              )}
+          <div className="space-y-2">
+            <div>
+              <span className="text-xs font-medium text-muted-foreground">
+                Available Sizes:
+              </span>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {product.size.slice(0, 4).map((size) => (
+                  <Badge key={size} variant="outline" className="text-xs">
+                    {size}
+                  </Badge>
+                ))}
+                {product.size.length > 4 && (
+                  <Badge variant="outline" className="text-xs">
+                    +{product.size.length - 4}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <span className="text-xs font-medium text-muted-foreground">
+                Colors:
+              </span>
+              <div className="flex flex-wrap gap-1 mt-1">
+                {product.color.slice(0, 3).map((color) => (
+                  <Badge key={color} variant="secondary" className="text-xs">
+                    {color}
+                  </Badge>
+                ))}
+                {product.color.length > 3 && (
+                  <Badge variant="secondary" className="text-xs">
+                    +{product.color.length - 3}
+                  </Badge>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -253,15 +333,25 @@ export function ProductCard({ product }: ProductCardProps) {
 
       <CardFooter className="p-4 pt-0 space-y-2">
         <Button
+          className={`w-full transition-all duration-300 ${
+            isAddedToCart
+              ? "bg-green-600 hover:bg-green-700"
+              : "bg-primary hover:bg-primary/90"
+          }`}
           onClick={handleAddToCart}
-          className="w-full bg-primary hover:bg-primary/90"
-          disabled={!selectedSize}
+          disabled={isAddedToCart}
         >
-          <Plus className="h-4 w-4 mr-2" />
-          Add to Cart - R{getSelectedPrice()}
-        </Button>
-        <Button variant="outline" className="w-full bg-transparent">
-          View Details
+          {isAddedToCart ? (
+            <>
+              <Check className="h-4 w-4 mr-2" />
+              Added to Cart!
+            </>
+          ) : (
+            <>
+              <ShoppingCart className="h-4 w-4 mr-2" />
+              Add to Cart - R{(getSelectedPrice() * quantity).toFixed(2)}
+            </>
+          )}
         </Button>
       </CardFooter>
     </Card>
