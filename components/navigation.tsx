@@ -41,7 +41,7 @@ export function Navigation() {
 
   const navItems = [
     { href: "/", label: "Home" },
-    { href: "/gallery", label: "Gallery" },
+    { href: "/store", label: "Store" },
     { href: "/sizing", label: "Sizing Chart" },
     { href: "/about", label: "About Us" },
     { href: "/contact", label: "Contact Us" },
