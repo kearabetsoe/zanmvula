@@ -14,9 +14,9 @@ export const metadata: Metadata = {
     "Custom traditional African garments for men. Authentic dashikis, agbadas, and cultural attire.",
   generator: "v0.app",
   icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
-    apple: "/logo.svg",
+    icon: "/zanemvula-logo.png",
+    shortcut: "/zanemvula-logo.png",
+    apple: "/zanemvula-logo.png",
   },
 };
 
