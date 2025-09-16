@@ -61,11 +61,11 @@ export function ProductCard({ product }: ProductCardProps) {
   const getComponentLabel = (component: string) => {
     switch (component) {
       case "waistcoat":
-        return "Waistcoat Only";
+        return "Waistcoat";
       case "pants":
-        return "Pants Only";
+        return "Pants";
       case "fullAttire":
-        return "Full Attire";
+        return "2 Piece Set";
       default:
         return component;
     }
@@ -122,8 +122,8 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Card className="group hover:shadow-lg transition-all duration-300 overflow-hidden">
       <CardContent className="p-0">
-        <div className="relative overflow-hidden">
-          <div className="relative h-64">
+        <div className="relative overflow-hidden rounded-tl-lg rounded-tr-lg -mt-6">
+          <div className="relative h-145">
             <img
               src={product.images[currentImageIndex] || "/placeholder.svg"}
               alt={`${product.name} - Image ${currentImageIndex + 1}`}
@@ -166,7 +166,7 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
 
-          <Button
+          {/* <Button
             variant="ghost"
             size="icon"
             className={`absolute top-2 right-2 bg-white/80 hover:bg-white ${
@@ -175,7 +175,7 @@ export function ProductCard({ product }: ProductCardProps) {
             onClick={() => setIsLiked(!isLiked)}
           >
             <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
-          </Button>
+          </Button> */}
           <Badge className="absolute top-2 left-2 bg-primary text-primary-foreground">
             {product.category.charAt(0).toUpperCase() +
               product.category.slice(1)}
@@ -186,13 +186,13 @@ export function ProductCard({ product }: ProductCardProps) {
           <h3 className="font-semibold text-lg mb-2 text-balance">
             {product.name}
           </h3>
-          <p className="text-sm text-muted-foreground mb-3 text-pretty line-clamp-2">
+          {/* <p className="text-sm text-muted-foreground mb-3 text-pretty line-clamp-2">
             {product.description}
-          </p>
+          </p> */}
 
           <div className="mb-4">
             <span className="text-xs font-medium text-muted-foreground mb-2 block">
-              Choose Component:
+              Choose Item:
             </span>
             <div className="grid grid-cols-3 gap-1">
               {(["waistcoat", "pants", "fullAttire"] as const).map(
@@ -276,14 +276,18 @@ export function ProductCard({ product }: ProductCardProps) {
             <div className="grid grid-cols-3 gap-2 text-xs">
               <div className="text-center">
                 <div className="font-medium">Waistcoat</div>
-                <div className="text-primary font-bold">R{product.pricing.waistcoat}</div>
+                <div className="text-primary font-bold">
+                  R{product.pricing.waistcoat}
+                </div>
               </div>
               <div className="text-center">
                 <div className="font-medium">Pants</div>
-                <div className="text-primary font-bold">R{product.pricing.pants}</div>
+                <div className="text-primary font-bold">
+                  R{product.pricing.pants}
+                </div>
               </div>
               <div className="text-center">
-                <div className="font-medium">Full Set</div>
+                <div className="font-medium">2 Piece Set</div>
                 <div className="text-primary font-bold">
                   R {product.pricing.fullAttire}
                 </div>

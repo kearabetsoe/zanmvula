@@ -54,17 +54,16 @@ export async function POST(request: NextRequest) {
 
     // Here you would integrate with your preferred email service
     // Example with Resend:
-    /*
-    const { Resend } = require('resend')
-    const resend = new Resend(process.env.RESEND_API_KEY)
-    
+
+    const { Resend } = require("resend");
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     await resend.emails.send({
-      from: 'orders@zanemvula.com',
-      to: 'kgntamane@gmail.com',
+      from: "onboarding@resend.dev",
+      to: "kgntamane@gmail.com",
       subject: `New Order - ${orderData.orderReference}`,
       html: emailContent,
-    })
-    */
+    });
 
     return NextResponse.json({
       success: true,
@@ -90,9 +89,9 @@ function createOrderEmailContent(orderData: OrderData): string {
       case "pants":
         return "Pants Only";
       case "full":
-        return "Full Attire Set";
+        return "2 Piece Set";
       default:
-        return "Full Attire Set";
+        return "2 Piece Set";
     }
   };
 
@@ -144,49 +143,49 @@ function createOrderEmailContent(orderData: OrderData): string {
             (item) => `
           <div class="item">
             <p><strong>${item.productName}</strong></p>
-            <p>Component: ${getComponentDisplayName(item.component)}</p>
+            <p>Item: ${getComponentDisplayName(item.component)}</p>
             <p>Size: ${item.size}</p>
             <p>Quantity: ${item.quantity}</p>
-            <p>Price: $${(item.price * item.quantity).toFixed(2)}</p>
+            <p>Price: R${(item.price * item.quantity).toFixed(2)}</p>
           </div>
         `
           )
           .join("")}
         
         <div class="total">
-          <p>Total Order Value: $${total.toFixed(2)}</p>
+          <p>Total Order Value: R${total.toFixed(2)}</p>
         </div>
         
         <div class="measurements">
           <h2 class="section-title">📏 Custom Measurements</h2>
           ${
             formData.chest
-              ? `<p><strong>Chest/Bust:</strong> ${formData.chest} inches</p>`
+              ? `<p><strong>Chest/Bust:</strong> ${formData.chest} centimeters</p>`
               : ""
           }
           ${
             formData.waist
-              ? `<p><strong>Waist:</strong> ${formData.waist} inches</p>`
+              ? `<p><strong>Waist:</strong> ${formData.waist} centimeters</p>`
               : ""
           }
           ${
             formData.hips
-              ? `<p><strong>Hips:</strong> ${formData.hips} inches</p>`
+              ? `<p><strong>Hips:</strong> ${formData.hips} centimeters</p>`
               : ""
           }
           ${
             formData.shoulders
-              ? `<p><strong>Shoulder Width:</strong> ${formData.shoulders} inches</p>`
+              ? `<p><strong>Shoulder Width:</strong> ${formData.shoulders} centimeters</p>`
               : ""
           }
           ${
             formData.sleeves
-              ? `<p><strong>Arm Length:</strong> ${formData.sleeves} inches</p>`
+              ? `<p><strong>Arm Length:</strong> ${formData.sleeves} centimeters</p>`
               : ""
           }
           ${
             formData.inseam
-              ? `<p><strong>Inseam Length:</strong> ${formData.inseam} inches</p>`
+              ? `<p><strong>Inseam Length:</strong> ${formData.inseam} centimeters</p>`
               : ""
           }
           ${

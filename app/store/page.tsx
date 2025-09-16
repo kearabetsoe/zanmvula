@@ -13,9 +13,9 @@ const products = [
       "/design-1-top-1.JPG",
     ],
     pricing: {
-      waistcoat: 550.0,
+      waistcoat: 850.0,
       pants: 750.0,
-      fullAttire: 1300.0,
+      fullAttire: 1600.0,
     },
     category: "traditional",
     size: ["S", "M", "L", "XL", "XXL"],
@@ -32,9 +32,9 @@ const products = [
       "/design-2-top-2.JPG",
     ],
     pricing: {
-      waistcoat: 550.0,
+      waistcoat: 850.0,
       pants: 750.0,
-      fullAttire: 1300.0,
+      fullAttire: 1600.0,
     },
     category: "traditional",
     size: ["M", "L", "XL", "XXL"],

@@ -1,85 +1,90 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-import { ShoppingCart, Trash2, ArrowLeft, ArrowRight } from "lucide-react"
-import Link from "next/link"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ShoppingCart, Trash2, ArrowLeft, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 interface CartItem {
-  id: string
-  productId: number
-  productName: string
-  component: "waistcoat" | "pants" | "full"
-  price: number
-  quantity: number
-  size: string
-  image: string
+  id: string;
+  productId: number;
+  productName: string;
+  component: "waistcoat" | "pants" | "full";
+  price: number;
+  quantity: number;
+  size: string;
+  image: string;
 }
 
 export default function CartPage() {
-  const [cart, setCart] = useState<CartItem[]>([])
+  const [cart, setCart] = useState<CartItem[]>([]);
 
   useEffect(() => {
-    console.log("[v0] Loading cart from localStorage")
-    const savedCart = localStorage.getItem("zanemvula-cart")
-    console.log("[v0] Raw cart data:", savedCart)
+    console.log("[v0] Loading cart from localStorage");
+    const savedCart = localStorage.getItem("zanemvula-cart");
+    console.log("[v0] Raw cart data:", savedCart);
 
     if (savedCart) {
       try {
-        const parsedCart = JSON.parse(savedCart)
-        console.log("[v0] Parsed cart:", parsedCart)
-        setCart(parsedCart)
+        const parsedCart = JSON.parse(savedCart);
+        console.log("[v0] Parsed cart:", parsedCart);
+        setCart(parsedCart);
       } catch (error) {
-        console.error("[v0] Failed to load cart from localStorage:", error)
-        localStorage.removeItem("zanemvula-cart")
+        console.error("[v0] Failed to load cart from localStorage:", error);
+        localStorage.removeItem("zanemvula-cart");
       }
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (cart.length > 0) {
-      localStorage.setItem("zanemvula-cart", JSON.stringify(cart))
+      localStorage.setItem("zanemvula-cart", JSON.stringify(cart));
     } else {
-      localStorage.removeItem("zanemvula-cart")
+      localStorage.removeItem("zanemvula-cart");
     }
 
     // Dispatch cart update event for navigation
-    window.dispatchEvent(new Event("cartUpdated"))
-  }, [cart])
+    window.dispatchEvent(new Event("cartUpdated"));
+  }, [cart]);
 
   const removeFromCart = (itemId: string) => {
-    setCart((prev) => prev.filter((item) => item.id !== itemId))
-  }
+    setCart((prev) => prev.filter((item) => item.id !== itemId));
+  };
 
   const updateCartItemQuantity = (itemId: string, quantity: number) => {
-    if (quantity < 1) return
-    setCart((prev) => prev.map((item) => (item.id === itemId ? { ...item, quantity } : item)))
-  }
+    if (quantity < 1) return;
+    setCart((prev) =>
+      prev.map((item) => (item.id === itemId ? { ...item, quantity } : item))
+    );
+  };
 
   const getCartTotal = () => {
-    return cart.reduce((total, item) => total + item.price * item.quantity, 0)
-  }
+    return cart.reduce((total, item) => total + item.price * item.quantity, 0);
+  };
 
   const getComponentDisplayName = (component: string) => {
     switch (component) {
       case "waistcoat":
-        return "Waistcoat Only"
+        return "Waistcoat Only";
       case "pants":
-        return "Pants Only"
+        return "Pants Only";
       case "full":
-        return "Full Attire Set"
+        return "2 Piece Set";
       default:
-        return "Full Attire Set"
+        return "2 Piece Set";
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
       <div className="flex items-center gap-4 mb-8">
         <Link href="/store">
-          <Button variant="outline" className="flex items-center gap-2 bg-transparent">
+          <Button
+            variant="outline"
+            className="flex items-center gap-2 bg-transparent"
+          >
             <ArrowLeft className="h-4 w-4" />
             Continue Shopping
           </Button>
@@ -94,7 +99,8 @@ export default function CartPage() {
             Cart Items ({cart.length})
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Your cart is automatically saved. Items will remain here until you're ready to checkout.
+            Your cart is automatically saved. Items will remain here until
+            you're ready to checkout.
           </p>
         </CardHeader>
         <CardContent className="p-6">
@@ -103,10 +109,13 @@ export default function CartPage() {
               <ShoppingCart className="h-16 w-16 mx-auto mb-4 opacity-30" />
               <h3 className="text-xl font-semibold mb-2">Your cart is empty</h3>
               <p className="text-muted-foreground mb-6">
-                Browse our collection of traditional African attire to get started.
+                Browse our collection of traditional African attire to get
+                started.
               </p>
               <Link href="/store">
-                <Button className="bg-primary hover:bg-primary/90">Browse Gallery</Button>
+                <Button className="bg-primary hover:bg-primary/90">
+                  Browse Gallery
+                </Button>
               </Link>
             </div>
           ) : (
@@ -124,10 +133,18 @@ export default function CartPage() {
                       className="w-full sm:w-20 h-48 sm:h-20 object-cover rounded"
                     />
                     <div className="flex-1 w-full">
-                      <h4 className="font-semibold text-lg">{item.productName}</h4>
-                      <p className="text-sm text-muted-foreground mb-1">{getComponentDisplayName(item.component)}</p>
-                      <p className="text-sm text-muted-foreground">Size: {item.size}</p>
-                      <p className="text-sm font-medium text-primary mt-1">R{item.price.toFixed(2)} each</p>
+                      <h4 className="font-semibold text-lg">
+                        {item.productName}
+                      </h4>
+                      <p className="text-sm text-muted-foreground mb-1">
+                        {getComponentDisplayName(item.component)}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Size: {item.size}
+                      </p>
+                      <p className="text-sm font-medium text-primary mt-1">
+                        R{item.price.toFixed(2)} each
+                      </p>
                     </div>
 
                     {/* Quantity Controls */}
@@ -136,16 +153,22 @@ export default function CartPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => updateCartItemQuantity(item.id, item.quantity - 1)}
+                          onClick={() =>
+                            updateCartItemQuantity(item.id, item.quantity - 1)
+                          }
                           className="h-8 w-8 p-0"
                         >
                           -
                         </Button>
-                        <span className="w-8 text-center font-medium">{item.quantity}</span>
+                        <span className="w-8 text-center font-medium">
+                          {item.quantity}
+                        </span>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => updateCartItemQuantity(item.id, item.quantity + 1)}
+                          onClick={() =>
+                            updateCartItemQuantity(item.id, item.quantity + 1)
+                          }
                           className="h-8 w-8 p-0"
                         >
                           +
@@ -153,7 +176,9 @@ export default function CartPage() {
                       </div>
 
                       <div className="flex items-center gap-3 ml-auto">
-                        <span className="font-semibold text-lg">R{(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="font-semibold text-lg">
+                          R{(item.price * item.quantity).toFixed(2)}
+                        </span>
                         <Button
                           variant="outline"
                           size="sm"
@@ -174,10 +199,13 @@ export default function CartPage() {
               <div className="bg-muted p-6 rounded-lg">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-lg font-semibold">Subtotal:</span>
-                  <span className="text-2xl font-bold text-primary">R{getCartTotal().toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-primary">
+                    R{getCartTotal().toFixed(2)}
+                  </span>
                 </div>
                 <p className="text-sm text-muted-foreground mb-6">
-                  *Final pricing may vary based on custom measurements and traditional embellishments
+                  *Final pricing may vary based on custom measurements and
+                  traditional embellishments
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3">
@@ -199,5 +227,5 @@ export default function CartPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
