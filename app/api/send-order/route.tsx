@@ -59,8 +59,8 @@ export async function POST(request: NextRequest) {
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to: "kgntamane@gmail.com",
+      from: `ZaneMvula <${process.env.EMAIL_SENDER}>`,
+      to: process.env.EMAIL_RECEIVER,
       subject: `New Order - ${orderData.orderReference}`,
       html: emailContent,
     });
