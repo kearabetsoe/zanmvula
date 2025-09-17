@@ -71,7 +71,7 @@ export function ContactForm() {
   };
 
   const handleWhatsApp = () => {
-    const phoneNumber = "27674158325"; // South African format
+    const phoneNumber = "27843892067"; // South African format
     const message = encodeURIComponent(
       `Hi! I'm interested in your traditional African clothing. Can you help me with more information?`
     );
